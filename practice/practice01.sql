@@ -10,7 +10,7 @@
 “이름”, “월급”, “전화번호”, “입사일” 로 컬럼이름을 대체해 보세요.
 */
 
-select first_name||''||last_name as "이름",
+select first_name||' '||last_name as "이름",
        salary as "월급",
        phone_number as "전화번호",
        hire_date as "입사일"
@@ -22,7 +22,8 @@ order by hire_date asc;
 업무(jobs)별로 업무이름(job_title)과 최고월급(max_salary)을 월급의 내림차순(DESC)로 정렬하세요.
 */
 
-select *
+select job_id,
+       salary --컬럼이없어서 표기
 from employees
 order by job_id asc, salary desc;
 
@@ -62,7 +63,7 @@ select first_name,
        nvl(commission_pct,0)
 from employees
 where salary <14000
-and 10000<salary
+and 10000<=salary
 order by salary desc;
 
 /*
@@ -73,7 +74,8 @@ order by salary desc;
 
 select first_name,
        salary,
-       to_char(hire_date,'yyyy-mm')
+       to_char(hire_date,'yyyy-mm'),
+       department_id
 from employees
 where department_id in(10,90,100);
 /*
@@ -83,24 +85,25 @@ where department_id in(10,90,100);
 select first_name,
        salary 
 from employees
-where first_name like '%S%'
-or first_name like '%s%';
+where UPPER(first_name) like '%S%'; --WHERE문은 조회에는 표기되지않지만 조건을 짜기 때문에 여기서 UPPER로 모두 대문자로 만들어준후에 대문자 S를
+--찾게끔 해놓으면 조회에는 대문자 S 소문자 s를 다 찾는 꼴이된다.
+
 
 /*
 문제8.
 전체 부서를 출력하려고 합니다. 순서는 부서이름이 긴 순서대로 출력해 보세오.
 */
 
-select *
-from employees
-order by length(department_id) desc;
+select department_name
+from departments
+order by length(department_name) desc;
 /*
 문제9.
 정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
 올림차순(ASC)으로 정렬해 보세오.
 */
 
-select upper(country_name)
+select upper(country_name) contry_name --함수가 보이지 않게 별명으로 원래 이름을 붙여준다
 from countries
 where country_name is not null
 order by country_name asc;
@@ -113,8 +116,8 @@ order by country_name asc;
 
 select first_name,
        salary, 
-       replace(phone_number,'.','-'),
+       replace(phone_number,'.','-') phone_number,
        hire_date
 from employees
-where hire_date <'03/12/31';
+where hire_date <='03/12/31'; -- 이전은 그 기준 값을 포함한다 
 

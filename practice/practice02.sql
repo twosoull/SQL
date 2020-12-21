@@ -3,7 +3,7 @@
 *************************************/
 --문제1. 매니저가 있는 직원은 몇 명입니까? 아래의 결과가 나오도록 쿼리문을 작성하세요
 
-select count(*)
+select count(manager_id)
 from employees
 where manager_id is not null;
 
@@ -18,7 +18,10 @@ from employees;
 --문제3. 마지막으로 신입사원이 들어온 날은 언제 입니까? 다음 형식으로 출력해주세요.
 --예) 2014년 07월 10일
 
-select min(to_char(hire_date,'yyyy"년" month dd"일"'))
+ select max(to_char(hire_date,'yyyy"년" mm"월" dd"일"'))
+ from employees;
+
+select to_char(max(hire_date),'yyyy"년" mm"월" dd"일"')
 from employees;
 
 --문제4. 부서별로 평균임금, 최고임금, 최저임금을 부서아이디(department_id)와 함께 출력합니다.
@@ -29,7 +32,8 @@ select  department_id,
         max(salary),
         min(salary)
 from employees
-group by department_id;
+group by department_id
+order by department_id desc;
 
 --문제5.업무(job_id)별로 평균임금, 최고임금, 최저임금을 업무아이디(job_id)와 함께 출력하고 
 --정렬순서는 최저임금 내림차순, 평균임금(소수점 반올림), 오름차순 순입니다. (정렬순서는 최소임금 2500 구간일때 확인해볼 것)
@@ -45,7 +49,7 @@ order by min(salary) desc, round(avg(salary),0) asc;
 --문제6.가장 오래 근속한 직원의 입사일은 언제인가요? 다음 형식으로 출력해주세요.
 --예) 2001-01-13 토요일 
 
-select to_char(max(hire_date),'yyyy-mm-dd day')
+select to_char(min(hire_date),'yyyy-mm-dd day')
 from employees;
 
 --문제7.평균임금과 최저임금의 차이가 2000 미만인 부서(department_id), 
@@ -63,7 +67,8 @@ order by avg(salary)-min(salary) desc;
 --문제8. 업무(JOBS)별로 최고임금과 최저임금의 차이를 출력해보세요.
 --차이를 확인할 수 있도록 내림차순으로 정렬하세요? 
 
-select max(salary)-min(salary)
+select  job_id,
+        max(salary)-min(salary)
 from employees
 group by job_id
 order by max(salary)-min(salary) desc;
@@ -72,13 +77,13 @@ order by max(salary)-min(salary) desc;
 --출력은 관리자별로 평균급여가 5000이상 중에 평균급여 최소급여 최대급여를 출력합니다.
 --평균급여의 내림차순으로 정렬하고 평균급여는 소수점 첫째짜리에서 반올림 하여 출력합니다.
 
-select hire_date,
+select manager_id,
        round(avg(salary),0),
        min(salary),
        max(salary)
 from employees
 where hire_date>= '2005-01-01'
-group by hire_date
+group by manager_id
 having avg(salary)>=5000.0
 order by avg(salary) desc;
 
@@ -88,13 +93,12 @@ order by avg(salary) desc;
 --이후입사자는 ‘상장이후입사’ optDate 컬럼의 데이터로 출력하세요.
 --정렬은 입사일로 오름차순으로 정렬합니다.
 
-select  
-        first_name,
+select  first_name,
         hire_date,
         case
         when hire_date < = '02/12/31' then '창립멤버'
-        when hire_date <= '03/12/31' then '3년입사'
-        when hire_date <= '04/12/31' then '4년입사'
+        when hire_date >= '03/01/01' and hire_date<= '03/12/31' then '3년입사'
+        when hire_date >= '04/01/01' and hire_date<='04/12/31' then '4년입사'
         else '상장이후입사'
         end as "optDate"
 from employees

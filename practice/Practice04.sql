@@ -182,6 +182,56 @@ from employees em,(select  department_id,
                  from employees
                  group by department_id) pl
 where em.department_id = pl.department_id
-and em.salary >all (pl.sal)
+and em.salary >all (pl.sal);
 
 --부서별로 서로 다른 평균값을 가지고있기 때문에 먼저 department_ id로 같은 값을 잡아준 뒤에 비교로 평균임급값을 대입해 줬습니다
+
+
+--문제8.
+--직원 입사일이 11번째에서 15번째의 직원의 사번, 이름, 급여, 입사일을 입사일 순서로 출력하세요
+--1.rownum으로 숫자를 매기기는 모든 데이터가 다 준비가 된뒤에 붙여줘야 하기 때문에 입사일 순서먼저 정해줘야한다. rownum을 한뒤에
+-- 정렬을 하면 다시 뒤섞이기 때문이다.
+select employee_id,
+       first_name,
+       salary,
+       hire_date
+from employees
+order by hire_date;
+
+----
+
+--rownum을 붙였다고 바로 1번째부터를 제외한 조건을 where문으로 넣으려하면 select 이전에 처리하기때문에 rownum문은 1번째를 계속 만드려고시도해서
+--결국 아무것도 표시가 안된다.
+select rownum,
+       o.employee_id,
+       o.first_name,
+       o.salary,
+       o.hire_date
+from (select employee_id,
+             first_name,
+             salary,
+             hire_date
+      from employees
+      order by hire_date)o;
+
+---그러므로 rowmun이 모두 만들어진 다음에 where문을 넣어줘야하기 때문에 서브퀄리문으로 빼내야한다
+
+select ro.rnum,
+       ro.employee_id,
+       ro.first_name,
+       ro.salary,
+       ro.hire_date
+from (select rownum as rnum,
+             o.employee_id,
+             o.first_name,
+             o.salary,
+             o.hire_date
+       from (select employee_id,
+                    first_name,
+                    salary,
+                    hire_date
+             from employees
+             order by hire_date)o
+             )ro
+where ro.rnum >=11
+and ro.rnum <=15
